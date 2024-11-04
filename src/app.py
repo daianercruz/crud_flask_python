@@ -7,11 +7,13 @@ from flask import Flask, current_app
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped, mapped_column
+from flask_migrate import Migrate
 
 class Base(DeclarativeBase):
   pass
 
 db = SQLAlchemy(model_class=Base)
+migrate = Migrate()
 
 class User(db.Model):
     id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
@@ -56,11 +58,14 @@ def create_app(test_config=None):
         # load the test config if passed in
         app.config.from_mapping(test_config)
     
-
+    #register cli commands
     app.cli.add_command(init_db_command)
 
+    #initialize extensions
     db.init_app(app)
+    migrate.init_app(app, db)
 
+    #register blueprints
     from src.controller import user
     app.register_blueprint(user.app)
 
