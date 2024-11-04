@@ -13,13 +13,13 @@ def _create_user():
 
 def _list_users():
     query = db.select(User)
-    results = db.session.execute(query).scalars()
+    users = db.session.execute(query).scalars()
     return [
         {
-            'id': result.id, 
-            'username': result.username
+            'id': user.id, 
+            'username': user.username
         } 
-            for result in results
+            for user in users
     ]
 
 @app.route('/', methods=['GET', 'POST'])
@@ -30,3 +30,12 @@ def handle_user():
     else:
         return{'users': _list_users()}
 
+
+@app.route("/<int:user_id>")
+def get_user(user_id):
+    user = db.get_or_404(User,user_id)
+    return{
+            'id': user.id, 
+            'username': user.username
+        } 
+         

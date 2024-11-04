@@ -41,7 +41,6 @@ def init_db_command():
     click.echo('Initialized the database.')
 
 
-
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
