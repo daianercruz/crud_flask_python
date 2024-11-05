@@ -8,6 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped, mapped_column
 from flask_migrate import Migrate
+from flask_jwt_extended import JWTManager
 
 class Base(DeclarativeBase):
   pass
@@ -49,6 +50,7 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev',
         SQLALCHEMY_DATABASE_URI='sqlite:///crud-flask-python.sqlite',
+        JWT_SECRET_KEY = "super-secret"
     )
 
     if test_config is None:
@@ -64,13 +66,15 @@ def create_app(test_config=None):
     #initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
+    jwt = JWTManager(app)
 
     #register blueprints
-    from src.controller import user
+    from src.controller import user, post, auth
+    
     app.register_blueprint(user.app)
-
-    from src.controller import post
     app.register_blueprint(post.app)
+    app.register_blueprint(auth.app)
+
 
     return app
 
